@@ -1,26 +1,131 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Pathwise custom colors */
+  --color-lime: #c2ef4e;
+  --color-pink: #fa7faa;
+  --color-violet-mid: #79628c;
+  --color-violet-deep: #422082;
+  --color-violet-link: #6a5fc1;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: #1f1633;
+  --foreground: #ffffff;
+  --card: #150f23;
+  --card-foreground: #ffffff;
+  --popover: #150f23;
+  --popover-foreground: #ffffff;
+  --primary: #c2ef4e;
+  --primary-foreground: #150f23;
+  --secondary: #362d59;
+  --secondary-foreground: #ffffff;
+  --muted: #362d59;
+  --muted-foreground: rgba(255,255,255,0.72);
+  --accent: #422082;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: #362d59;
+  --input: #362d59;
+  --ring: #6a5fc1;
+  --chart-1: #c2ef4e;
+  --chart-2: #fa7faa;
+  --chart-3: #6a5fc1;
+  --chart-4: #79628c;
+  --chart-5: #422082;
+  --radius: 0.5rem;
+  --sidebar: #150f23;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #c2ef4e;
+  --sidebar-primary-foreground: #150f23;
+  --sidebar-accent: #362d59;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #362d59;
+  --sidebar-ring: #6a5fc1;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Rubik', -apple-system, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  html {
+    @apply font-sans;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-lime {
+    color: #c2ef4e;
+  }
+  .bg-lime {
+    background-color: #c2ef4e;
+  }
+  .text-pink-accent {
+    color: #fa7faa;
+  }
+  .bg-night {
+    background-color: #150f23;
+  }
+  .bg-canvas {
+    background-color: #1f1633;
+  }
+  .border-hairline {
+    border-color: #362d59;
+  }
+  .highlight-chip {
+    background-color: #c2ef4e;
+    color: #150f23;
+    padding: 0 12px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
 }
