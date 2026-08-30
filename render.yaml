@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: pathwise-ai-backend
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.12.0"
