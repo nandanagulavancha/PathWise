@@ -67,12 +67,15 @@ export default function OnboardingPage() {
     }
     setError("");
     setLoading(true);
-    setGeneratingStep("Analyzing your goal...");
+    setGeneratingStep("Saving your profile...");
     try {
-      setGeneratingStep("Building your personalized roadmap...");
       await api.completeOnboarding(data, user.id);
-      setGeneratingStep("Done! Redirecting...");
-      router.push("/dashboard");
+      setGeneratingStep("Your roadmap is being generated in the background...");
+      // Wait briefly then redirect — roadmap generates in background
+      setTimeout(() => {
+        setGeneratingStep("Redirecting to your dashboard...");
+        router.push("/dashboard");
+      }, 2000);
     } catch (err) {
       console.error("Onboarding failed:", err);
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");

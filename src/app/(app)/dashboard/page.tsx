@@ -132,17 +132,38 @@ function ContinueLearningCard({ segment }: { segment: { id: string; title: strin
 }
 
 function EmptyRoadmapCard() {
+  const { user } = useAuth();
+  const [checking, setChecking] = useState(false);
+
+  const checkStatus = async () => {
+    if (!user) return;
+    setChecking(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/goals/roadmap-status/${user.id}`);
+      const data = await res.json();
+      if (data.status === "ready") {
+        window.location.reload();
+      }
+    } catch {}
+    setChecking(false);
+  };
+
+  // Auto-check every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(checkStatus, 5000);
+    return () => clearInterval(interval);
+  }, [user]);
+
   return (
     <div className="bg-night border border-hairline rounded-xl p-8 text-center">
-      <Brain className="h-12 w-12 text-lime mx-auto mb-4" />
-      <h3 className="text-lg font-bold mb-2">No roadmap yet</h3>
-      <p className="text-sm text-muted-foreground mb-4">Tell me what you want to achieve, and I&apos;ll build your first learning path.</p>
-      <Link
-        href="/onboarding"
-        className="inline-flex items-center gap-2 bg-lime text-[#150f23] px-5 py-2 rounded-md text-sm font-bold uppercase tracking-wide hover:opacity-90 transition-opacity"
-      >
-        Get Started <ArrowRight className="h-4 w-4" />
-      </Link>
+      <Brain className="h-12 w-12 text-lime mx-auto mb-4 animate-pulse" />
+      <h3 className="text-lg font-bold mb-2">Your roadmap is being generated</h3>
+      <p className="text-sm text-muted-foreground mb-4">
+        Our AI is analyzing your goals and finding the best learning resources. This may take 1-2 minutes.
+      </p>
+      <div className="w-48 h-1.5 bg-[#362d59] rounded-full mx-auto overflow-hidden">
+        <div className="h-full bg-lime rounded-full animate-[pulse_2s_ease-in-out_infinite] w-2/3" />
+      </div>
     </div>
   );
 }
