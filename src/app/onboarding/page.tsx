@@ -286,9 +286,15 @@ function StepSkills({ data, setData }: { data: OnboardingData; setData: React.Di
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
-    api.getSkills().then((s) => {
-      if (Array.isArray(s)) setAllSkills(s);
-    }).catch(() => {});
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    fetch(`${API_URL}/api/skills/`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setAllSkills(data);
+        }
+      })
+      .catch((err) => console.error("Skills fetch failed:", err));
   }, []);
 
   const categories = ["All", ...Array.from(new Set(allSkills.map((s) => s.category).filter(Boolean)))];
