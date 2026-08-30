@@ -7,7 +7,7 @@ class QuizEngine:
         self.db = SupabaseService()
         self.ai = AIService()
 
-    async def generate(self, segment_id: str) -> dict:
+    def generate(self, segment_id: str) -> dict:
         # Get segment info
         result = self.db.client.table("learning_segments").select(
             "*, segment_resources(resources(title))"
@@ -25,7 +25,7 @@ class QuizEngine:
         ]
 
         # Generate quiz questions
-        questions = await self.ai.generate_quiz(
+        questions = self.ai.generate_quiz(
             segment.get("title", ""),
             skills if isinstance(skills, list) else [skills],
             resource_titles,
@@ -36,7 +36,7 @@ class QuizEngine:
 
         # Save quiz
         quiz_data = {"segment_id": segment_id, "title": f"Reflection: {segment.get('title', '')}"}
-        quiz = await self.db.save_quiz(quiz_data)
+        quiz = self.db.save_quiz(quiz_data)
         quiz_id = quiz.get("id", "temp")
 
         # Save questions
@@ -54,7 +54,7 @@ class QuizEngine:
             saved_questions.append(q_data)
 
         if saved_questions:
-            await self.db.save_quiz_questions(saved_questions)
+            self.db.save_quiz_questions(saved_questions)
 
         return {
             "quiz_id": quiz_id,
@@ -71,8 +71,8 @@ class QuizEngine:
             ],
         }
 
-    async def evaluate(self, quiz_id: str, answers: list[int], user_id: str = "") -> dict:
-        quiz = await self.db.get_quiz(quiz_id)
+    def evaluate(self, quiz_id: str, answers: list[int], user_id: str = "") -> dict:
+        quiz = self.db.get_quiz(quiz_id)
         if not quiz:
             return {"error": "Quiz not found"}
 
@@ -88,7 +88,7 @@ class QuizEngine:
         score = correct / max(len(questions), 1)
 
         # Analyze result
-        analysis = await self.ai.analyze_quiz_result(score, questions, answers, {})
+        analysis = self.ai.analyze_quiz_result(score, questions, answers, {})
 
         # Save attempt if user_id is valid
         if user_id and len(user_id) > 10:
@@ -99,7 +99,7 @@ class QuizEngine:
                     "score": score,
                     "answers": answers,
                 }
-                await self.db.save_quiz_attempt(attempt_data)
+                self.db.save_quiz_attempt(attempt_data)
             except Exception as e:
                 print(f"Failed to save quiz attempt: {e}")
 

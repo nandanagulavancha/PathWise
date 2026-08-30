@@ -7,14 +7,14 @@ router = APIRouter()
 
 
 @router.post("/analyze")
-async def analyze_goal(data: GoalCreate):
+def analyze_goal(data: GoalCreate):
     ai = AIService()
-    analysis = await ai.analyze_goal(data.raw_goal)
+    analysis = ai.analyze_goal(data.raw_goal)
     return analysis
 
 
 @router.post("/onboarding")
-async def complete_onboarding(data: OnboardingData, user_id: str = None):
+def complete_onboarding(data: OnboardingData, user_id: str = None):
     ai = AIService()
     from app.services.supabase_service import SupabaseService
     from app.services.roadmap_generator import RoadmapGenerator
@@ -25,26 +25,26 @@ async def complete_onboarding(data: OnboardingData, user_id: str = None):
     if not uid or len(uid) < 10:
         raise HTTPException(status_code=400, detail="user_id is required (must be a valid UUID)")
 
-    profile = await db.create_profile(uid, data.profile)
+    profile = db.create_profile(uid, data.profile)
     if data.interests:
-        await db.save_interests(uid, data.interests)
+        db.save_interests(uid, data.interests)
     if data.skills:
-        await db.save_user_skills(uid, data.skills)
+        db.save_user_skills(uid, data.skills)
 
     if data.goal:
-        goal = await db.create_goal(uid, data.goal)
+        goal = db.create_goal(uid, data.goal)
         goal_id = goal.get("id")
 
         # Auto-generate roadmap
         try:
             generator = RoadmapGenerator()
-            roadmap = await generator.generate(goal_id)
+            roadmap = generator.generate(goal_id)
         except Exception as e:
             print(f"Roadmap generation failed: {e}")
             roadmap = None
 
         try:
-            analysis = await ai.analyze_goal(data.goal)
+            analysis = ai.analyze_goal(data.goal)
         except Exception as e:
             print(f"Goal analysis failed: {e}")
             analysis = {"goal": data.goal, "target_skills": [], "suggested_milestones": []}

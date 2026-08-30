@@ -9,7 +9,7 @@ class YouTubeProvider(LearningResourceProvider):
     def __init__(self):
         self.api_key = get_settings().youtube_api_key
 
-    async def search_resources(self, query: str, skill: str = None, difficulty: str = None, limit: int = 10, **kwargs) -> list[dict]:
+    def search_resources(self, query: str, skill: str = None, difficulty: str = None, limit: int = 10, **kwargs) -> list[dict]:
         search_query = query
         if skill:
             search_query = f"{skill} {query} tutorial"
@@ -27,8 +27,8 @@ class YouTubeProvider(LearningResourceProvider):
             "order": "relevance",
         }
 
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            response = await client.get(f"{self.BASE_URL}/search", params=params)
+        with httpx.Client(timeout=15.0) as client:
+            response = client.get(f"{self.BASE_URL}/search", params=params)
             if response.status_code != 200:
                 return []
 
@@ -45,7 +45,7 @@ class YouTubeProvider(LearningResourceProvider):
                     "id": ",".join(video_ids),
                     "key": self.api_key,
                 }
-                detail_response = await client.get(f"{self.BASE_URL}/videos", params=detail_params)
+                detail_response = client.get(f"{self.BASE_URL}/videos", params=detail_params)
                 if detail_response.status_code == 200:
                     for item in detail_response.json().get("items", []):
                         details[item["id"]] = {
@@ -80,15 +80,15 @@ class YouTubeProvider(LearningResourceProvider):
 
             return results
 
-    async def get_resource(self, external_id: str) -> dict | None:
+    def get_resource(self, external_id: str) -> dict | None:
         params = {
             "part": "snippet,contentDetails,statistics",
             "id": external_id,
             "key": self.api_key,
         }
 
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{self.BASE_URL}/videos", params=params)
+        with httpx.Client() as client:
+            response = client.get(f"{self.BASE_URL}/videos", params=params)
             if response.status_code != 200:
                 return None
 

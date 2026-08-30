@@ -9,7 +9,7 @@ class GitHubProvider(LearningResourceProvider):
     def __init__(self):
         self.token = get_settings().github_token
 
-    async def search_resources(self, query: str, skill: str = None, limit: int = 10, **kwargs) -> list[dict]:
+    def search_resources(self, query: str, skill: str = None, limit: int = 10, **kwargs) -> list[dict]:
         search_query = query
         if skill:
             search_query = f"{skill} {query}"
@@ -25,8 +25,8 @@ class GitHubProvider(LearningResourceProvider):
             "per_page": min(limit, 30),
         }
 
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{self.BASE_URL}/search/repositories", params=params, headers=headers)
+        with httpx.Client() as client:
+            response = client.get(f"{self.BASE_URL}/search/repositories", params=params, headers=headers)
             if response.status_code != 200:
                 return []
 
@@ -53,13 +53,13 @@ class GitHubProvider(LearningResourceProvider):
 
             return results
 
-    async def get_resource(self, external_id: str) -> dict | None:
+    def get_resource(self, external_id: str) -> dict | None:
         headers = {"Accept": "application/vnd.github.v3+json"}
         if self.token:
             headers["Authorization"] = f"token {self.token}"
 
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{self.BASE_URL}/repositories/{external_id}", headers=headers)
+        with httpx.Client() as client:
+            response = client.get(f"{self.BASE_URL}/repositories/{external_id}", headers=headers)
             if response.status_code != 200:
                 return None
 

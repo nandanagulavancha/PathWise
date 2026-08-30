@@ -8,7 +8,7 @@ class AdaptiveEngine:
         self.db = SupabaseService()
         self.ai = AIService()
 
-    async def adapt(self, path_id: str) -> dict:
+    def adapt(self, path_id: str) -> dict:
         # Get path with segments
         result = self.db.client.table("learning_paths").select(
             "*, learning_segments(*)"
@@ -50,27 +50,27 @@ class AdaptiveEngine:
                             "segment_id": segment["id"],
                             "reason": f"Quiz score ({score:.0%}) below threshold. Adding review material.",
                         })
-                        await self.db.update_segment_status(segment["id"], "needs_review")
+                        self.db.update_segment_status(segment["id"], "needs_review")
                     elif score >= 0.8:
                         adaptations.append({
                             "type": "advance",
                             "segment_id": segment["id"],
                             "reason": f"Excellent quiz score ({score:.0%}). Unlocking next segment.",
                         })
-                        await self.db.update_segment_status(segment["id"], "completed")
+                        self.db.update_segment_status(segment["id"], "completed")
                         # Unlock next
                         next_seq = segment.get("sequence", 0) + 1
                         for s in segments:
                             if s.get("sequence") == next_seq and s.get("status") == "locked":
-                                await self.db.update_segment_status(s["id"], "in_progress")
+                                self.db.update_segment_status(s["id"], "in_progress")
                                 break
 
         return {"adaptations": adaptations, "path_id": path_id}
 
-    async def process_feedback(self, user_id: str, feedback: FeedbackCreate):
+    def process_feedback(self, user_id: str, feedback: FeedbackCreate):
         if feedback.type == "too_easy" and feedback.segment_id:
-            await self.db.update_segment_status(feedback.segment_id, "completed")
+            self.db.update_segment_status(feedback.segment_id, "completed")
         elif feedback.type == "too_difficult" and feedback.segment_id:
-            await self.db.update_segment_status(feedback.segment_id, "needs_review")
+            self.db.update_segment_status(feedback.segment_id, "needs_review")
         elif feedback.type == "already_know" and feedback.segment_id:
-            await self.db.update_segment_status(feedback.segment_id, "completed")
+            self.db.update_segment_status(feedback.segment_id, "completed")

@@ -7,13 +7,13 @@ class RecommendationEngine:
         self.db = SupabaseService()
         self.embedding_service = EmbeddingService()
 
-    async def get_recommendations(self, user_id: str, limit: int = 10) -> list[dict]:
-        profile = await self.db.get_profile(user_id)
+    def get_recommendations(self, user_id: str, limit: int = 10) -> list[dict]:
+        profile = self.db.get_profile(user_id)
         if not profile:
             return []
 
-        user_skills = await self.db.get_user_skills(user_id)
-        path = await self.db.get_learning_path(user_id)
+        user_skills = self.db.get_user_skills(user_id)
+        path = self.db.get_learning_path(user_id)
 
         # Get current segment resources
         if path and path.get("segments"):
@@ -31,8 +31,8 @@ class RecommendationEngine:
 
         return []
 
-    async def get_next_actions(self, user_id: str) -> list[dict]:
-        path = await self.db.get_learning_path(user_id)
+    def get_next_actions(self, user_id: str) -> list[dict]:
+        path = self.db.get_learning_path(user_id)
         actions = []
 
         if not path:

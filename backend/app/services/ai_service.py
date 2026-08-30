@@ -25,7 +25,7 @@ class AIService:
                     raise
         raise Exception("Max retries exceeded for Gemini API")
 
-    async def analyze_goal(self, raw_goal: str) -> dict:
+    def analyze_goal(self, raw_goal: str) -> dict:
         prompt = f"""Analyze this learning goal and extract structured information.
 
 Goal: "{raw_goal}"
@@ -47,7 +47,7 @@ Be specific and practical. List 8-15 target skills. Return ONLY valid JSON."""
         response = self._generate_with_retry(prompt)
         return self._parse_json(response, GoalAnalysis)
 
-    async def extract_skills(self, text: str) -> list[str]:
+    def extract_skills(self, text: str) -> list[str]:
         prompt = f"""Extract technical/professional skills from this text.
 Text: "{text}"
 Return a JSON array of skill names. Example: ["Python", "Machine Learning", "SQL"]
@@ -59,7 +59,7 @@ Return ONLY the JSON array."""
         except json.JSONDecodeError:
             return []
 
-    async def generate_overview(self, segment_title: str, skills: list[str], goal: str, profile: dict) -> str:
+    def generate_overview(self, segment_title: str, skills: list[str], goal: str, profile: dict) -> str:
         prompt = f"""Generate a personalized learning overview for a segment.
 
 Segment: {segment_title}
@@ -79,7 +79,7 @@ Make it personalized and motivating. Do not be generic."""
         response = self.model.generate_content(prompt)
         return response.text
 
-    async def generate_quiz(self, segment_title: str, skills: list[str], resource_titles: list[str]) -> list[dict]:
+    def generate_quiz(self, segment_title: str, skills: list[str], resource_titles: list[str]) -> list[dict]:
         prompt = f"""Generate a reflection quiz for this learning segment with questions at 3 difficulty levels.
 
 Segment: {segment_title}
@@ -121,7 +121,7 @@ Return ONLY valid JSON array."""
         except (json.JSONDecodeError, KeyError):
             return []
 
-    async def analyze_quiz_result(self, score: float, questions: list, answers: list, profile: dict) -> dict:
+    def analyze_quiz_result(self, score: float, questions: list, answers: list, profile: dict) -> dict:
         weak = []
         strong = []
         for i, (q, a) in enumerate(zip(questions, answers)):
@@ -145,10 +145,10 @@ Return ONLY valid JSON array."""
             "recommended_action": action,
         }
 
-    async def explain_recommendation(self, resource_id: str, user_id: str) -> str:
+    def explain_recommendation(self, resource_id: str, user_id: str) -> str:
         return "This resource was recommended based on your skill gaps and learning goals."
 
-    async def chat_with_mentor(self, message: str, context: dict, history: list) -> str:
+    def chat_with_mentor(self, message: str, context: dict, history: list) -> str:
         profile = context.get("profile", {})
         path = context.get("learning_path")
         skills = context.get("skills", [])
@@ -175,7 +175,7 @@ Keep responses concise (2-4 paragraphs max)."""
         response = chat.send_message(message)
         return response.text
 
-    async def generate_roadmap_structure(self, goal_analysis: dict, skill_gaps: list, profile: dict) -> list[dict]:
+    def generate_roadmap_structure(self, goal_analysis: dict, skill_gaps: list, profile: dict) -> list[dict]:
         prompt = f"""Create a structured learning roadmap that progresses from easy to complex.
 
 Goal: {goal_analysis.get('goal', '')}

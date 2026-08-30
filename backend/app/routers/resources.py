@@ -7,7 +7,7 @@ router = APIRouter()
 
 
 @router.get("/search")
-async def search_resources(
+def search_resources(
     query: str,
     skill: str = None,
     difficulty: str = None,
@@ -16,25 +16,25 @@ async def search_resources(
 ):
     if provider == "youtube":
         p = YouTubeProvider()
-        results = await p.search_resources(query, skill=skill, difficulty=difficulty, limit=limit)
+        results = p.search_resources(query, skill=skill, difficulty=difficulty, limit=limit)
     elif provider == "github":
         p = GitHubProvider()
-        results = await p.search_resources(query, skill=skill, limit=limit)
+        results = p.search_resources(query, skill=skill, limit=limit)
     else:
         results = []
     return results
 
 
 @router.get("/{resource_id}")
-async def get_resource(resource_id: str):
+def get_resource(resource_id: str):
     db = SupabaseService()
-    resource = await db.get_resource(resource_id)
+    resource = db.get_resource(resource_id)
     return resource
 
 
 @router.get("/{resource_id}/explanation")
-async def get_recommendation_explanation(resource_id: str, user_id: str):
+def get_recommendation_explanation(resource_id: str, user_id: str):
     from app.services.ai_service import AIService
     ai = AIService()
-    explanation = await ai.explain_recommendation(resource_id, user_id)
+    explanation = ai.explain_recommendation(resource_id, user_id)
     return {"explanation": explanation}

@@ -13,10 +13,10 @@ class QuickQuizRequest(BaseModel):
 
 
 @router.post("/quick")
-async def quick_quiz(data: QuickQuizRequest):
+def quick_quiz(data: QuickQuizRequest):
     ai = AIService()
     try:
-        questions = await ai.generate_quiz(
+        questions = ai.generate_quiz(
             data.resource_title,
             [data.resource_title],
             [data.resource_title],
@@ -36,10 +36,10 @@ async def quick_quiz(data: QuickQuizRequest):
 
 
 @router.post("/generate")
-async def generate_quiz(data: QuizGenerateRequest):
+def generate_quiz(data: QuizGenerateRequest):
     engine = QuizEngine()
     try:
-        quiz = await engine.generate(data.segment_id)
+        quiz = engine.generate(data.segment_id)
         return quiz
     except Exception as e:
         print(f"Quiz generation error: {e}")
@@ -47,10 +47,10 @@ async def generate_quiz(data: QuizGenerateRequest):
 
 
 @router.post("/submit")
-async def submit_quiz(data: QuizSubmitRequest, user_id: str = ""):
+def submit_quiz(data: QuizSubmitRequest, user_id: str = ""):
     engine = QuizEngine()
     try:
-        result = await engine.evaluate(data.quiz_id, data.answers, user_id)
+        result = engine.evaluate(data.quiz_id, data.answers, user_id)
         return result
     except Exception as e:
         print(f"Quiz submit error: {e}")
@@ -58,8 +58,8 @@ async def submit_quiz(data: QuizSubmitRequest, user_id: str = ""):
 
 
 @router.get("/history/{user_id}")
-async def quiz_history(user_id: str):
+def quiz_history(user_id: str):
     from app.services.supabase_service import SupabaseService
     db = SupabaseService()
-    history = await db.get_quiz_attempts(user_id)
+    history = db.get_quiz_attempts(user_id)
     return history

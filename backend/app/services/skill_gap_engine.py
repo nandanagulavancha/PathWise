@@ -11,9 +11,9 @@ class SkillGapEngine:
         self.db = SupabaseService()
         self.ai = AIService()
 
-    async def compute_gaps(self, user_id: str) -> list[dict]:
-        user_skills = await self.db.get_user_skills(user_id)
-        profile = await self.db.get_profile(user_id)
+    def compute_gaps(self, user_id: str) -> list[dict]:
+        user_skills = self.db.get_user_skills(user_id)
+        profile = self.db.get_profile(user_id)
         if not profile:
             return []
 

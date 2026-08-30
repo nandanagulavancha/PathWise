@@ -13,24 +13,24 @@ class RoadmapGenerator:
         self.youtube = YouTubeProvider()
         self.github = GitHubProvider()
 
-    async def generate(self, goal_id: str) -> dict:
-        goal = await self.db.get_goal(goal_id)
+    def generate(self, goal_id: str) -> dict:
+        goal = self.db.get_goal(goal_id)
         if not goal:
             return {"error": "Goal not found"}
 
         user_id = goal["user_id"]
-        profile = await self.db.get_profile(user_id)
+        profile = self.db.get_profile(user_id)
         if not profile:
             return {"error": "Profile not found"}
 
         # Analyze goal with AI
-        goal_analysis = await self.ai.analyze_goal(goal["raw_goal"])
+        goal_analysis = self.ai.analyze_goal(goal["raw_goal"])
 
         # Compute skill gaps
-        gaps = await self.skill_gap.compute_gaps(user_id)
+        gaps = self.skill_gap.compute_gaps(user_id)
 
         # Generate roadmap structure
-        phases = await self.ai.generate_roadmap_structure(goal_analysis, gaps, profile)
+        phases = self.ai.generate_roadmap_structure(goal_analysis, gaps, profile)
         if not phases:
             return {"error": "Failed to generate roadmap structure"}
 
@@ -44,7 +44,7 @@ class RoadmapGenerator:
             "status": "active",
             "version": 1,
         }
-        path = await self.db.save_learning_path(path_data)
+        path = self.db.save_learning_path(path_data)
         path_id = path.get("id", "temp")
 
         # Create segments with resources
@@ -64,7 +64,7 @@ class RoadmapGenerator:
 
             for query, difficulty in difficulty_queries:
                 try:
-                    yt_results = await self.youtube.search_resources(query, difficulty=difficulty, limit=2)
+                    yt_results = self.youtube.search_resources(query, difficulty=difficulty, limit=2)
                     for r in yt_results:
                         if not any(existing.get("external_id") == r.get("external_id") for existing in resources):
                             r["difficulty"] = difficulty
@@ -81,7 +81,7 @@ class RoadmapGenerator:
             # Save top 5 resources
             saved_resources = []
             for r in resources[:5]:
-                saved = await self.db.save_resource(r)
+                saved = self.db.save_resource(r)
                 saved_resources.append(saved)
 
             # Create segment
@@ -94,7 +94,7 @@ class RoadmapGenerator:
                 "estimated_duration": phase.get("estimated_duration", "1-2 weeks"),
                 "status": status,
             }
-            segment = await self.db.save_learning_segment(segment_data)
+            segment = self.db.save_learning_segment(segment_data)
             segment["resources"] = saved_resources
             segments.append(segment)
 

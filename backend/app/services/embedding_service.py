@@ -7,7 +7,7 @@ class EmbeddingService:
         settings = get_settings()
         genai.configure(api_key=settings.gemini_api_key)
 
-    async def generate_embedding(self, text: str) -> list[float]:
+    def generate_embedding(self, text: str) -> list[float]:
         result = genai.embed_content(
             model="models/text-embedding-004",
             content=text,
@@ -15,7 +15,7 @@ class EmbeddingService:
         )
         return result["embedding"]
 
-    async def generate_query_embedding(self, text: str) -> list[float]:
+    def generate_query_embedding(self, text: str) -> list[float]:
         result = genai.embed_content(
             model="models/text-embedding-004",
             content=text,
@@ -23,7 +23,7 @@ class EmbeddingService:
         )
         return result["embedding"]
 
-    async def compute_similarity(self, embedding1: list[float], embedding2: list[float]) -> float:
+    def compute_similarity(self, embedding1: list[float], embedding2: list[float]) -> float:
         if not embedding1 or not embedding2:
             return 0.0
         dot = sum(a * b for a, b in zip(embedding1, embedding2))
