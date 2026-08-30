@@ -23,4 +23,4 @@ services:
       - key: FRONTEND_URL
         sync: false
       - key: PYTHON_VERSION
-        value: "3.12.0"
+        value: "3.12.3"
