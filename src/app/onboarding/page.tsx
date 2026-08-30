@@ -284,17 +284,21 @@ function StepSkills({ data, setData }: { data: OnboardingData; setData: React.Di
   const [allSkills, setAllSkills] = useState<{ id: string; name: string; category: string }[]>([]);
   const [filter, setFilter] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [skillsLoading, setSkillsLoading] = useState(true);
+  const [skillsError, setSkillsError] = useState("");
 
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    fetch(`${API_URL}/api/skills/`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setAllSkills(data);
-        }
+    setSkillsLoading(true);
+    api.getSkills()
+      .then((s) => {
+        const skills = Array.isArray(s) ? s : [];
+        setAllSkills(skills);
+        if (skills.length === 0) setSkillsError("No skills returned from server");
       })
-      .catch((err) => console.error("Skills fetch failed:", err));
+      .catch((err) => {
+        setSkillsError(`Failed to load skills: ${err.message || err}`);
+      })
+      .finally(() => setSkillsLoading(false));
   }, []);
 
   const categories = ["All", ...Array.from(new Set(allSkills.map((s) => s.category).filter(Boolean)))];
@@ -330,42 +334,57 @@ function StepSkills({ data, setData }: { data: OnboardingData; setData: React.Di
       <h2 className="text-xl font-semibold">Your Existing Skills</h2>
       <p className="text-sm text-muted-foreground">Select skills you already know and set your level</p>
 
-      <input
-        type="text"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className="w-full bg-[#1f1633] border border-hairline rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6a5fc1]"
-        placeholder="Search skills..."
-      />
+      {skillsLoading && (
+        <div className="text-sm text-muted-foreground animate-pulse">Loading skills...</div>
+      )}
 
-      <div className="flex gap-2 flex-wrap">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-              selectedCategory === cat ? "bg-lime text-[#150f23] border-lime" : "border-hairline hover:border-[#6a5fc1]"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      {skillsError && (
+        <div className="text-sm text-red-400 bg-red-400/10 border border-red-400/30 rounded-md p-3">
+          {skillsError}
+          <button onClick={() => window.location.reload()} className="ml-2 underline">Retry</button>
+        </div>
+      )}
 
-      <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
-        {filtered.slice(0, 30).map((skill) => (
-          <button
-            key={skill.id}
-            onClick={() => toggleSkill(skill)}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${
-              isSelected(skill.id) ? "bg-[#362d59] border border-lime" : "border border-hairline hover:border-[#6a5fc1]"
-            }`}
-          >
-            <span>{skill.name}</span>
-            <span className="text-xs text-muted-foreground">{skill.category}</span>
-          </button>
-        ))}
-      </div>
+      {!skillsLoading && allSkills.length > 0 && (
+        <>
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="w-full bg-[#1f1633] border border-hairline rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6a5fc1]"
+            placeholder="Search skills..."
+          />
+
+          <div className="flex gap-2 flex-wrap">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                  selectedCategory === cat ? "bg-lime text-[#150f23] border-lime" : "border-hairline hover:border-[#6a5fc1]"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
+            {filtered.slice(0, 30).map((skill) => (
+              <button
+                key={skill.id}
+                onClick={() => toggleSkill(skill)}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${
+                  isSelected(skill.id) ? "bg-[#362d59] border border-lime" : "border border-hairline hover:border-[#6a5fc1]"
+                }`}
+              >
+                <span>{skill.name}</span>
+                <span className="text-xs text-muted-foreground">{skill.category}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {data.skills.length > 0 && (
         <div>
