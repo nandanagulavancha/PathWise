@@ -93,7 +93,7 @@ export default function LearnSegmentPage() {
             ))
           ) : (
             <div className="bg-night border border-hairline rounded-xl p-8 text-center">
-              <p className="text-sm text-muted-foreground">Resources will be loaded when this segment is active.</p>
+              <p className="text-sm text-muted-foreground">No resources found for this segment yet. Try regenerating your roadmap from the Profile page.</p>
             </div>
           )}
         </div>

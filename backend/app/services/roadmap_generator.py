@@ -154,7 +154,7 @@ class RoadmapGenerator:
             else:
                 difficulty = "advanced"
 
-            status = "in_progress" if idx == 0 else ("upcoming" if idx == 1 else "locked")
+            status = "in_progress" if idx == 0 else "upcoming"
             segment_data = {
                 "learning_path_id": path_id,
                 "title": phase_name,
